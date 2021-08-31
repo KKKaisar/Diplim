@@ -1,6 +1,7 @@
 <template>
   <div id="wrapper">
     <main class="main">
+      {{ ab.a }}
       <div class="manager">
         <div class="menu">
           <div class="mode">Font size</div>
@@ -105,13 +106,17 @@
               onmouseup=""
               onclick="vm.dragFunc(this.parentElement,event)"
             ></div>
-            <div
-              v-for="(line, i) in lines"
+            <Lines
+              v-for="(line, i) in lines[index]"
               :key="i"
               :class="'drag' + index + '' + i"
+              :item="item"
+              :index="index"
+              :line="line"
+              :i="i"
             >
-              {{ "&nbsp;".repeat(spaces) }}{{ line }}
-            </div>
+              <!-- {{ "&nbsp;".repeat(spaces) }}{{ line }} -->
+            </Lines>
             <!-- < div
                     : style = "{border:bdr}"
                     style = "display: block; z-index: 30"
@@ -129,7 +134,7 @@
 </template>
 
 <script>
-// import Lines from "./components/Lines.vue";
+import Lines from "./components/Lines.vue";
 
 let students = [
   [
@@ -162,6 +167,7 @@ export default {
   // el: "#wrapper",
   data() {
     return {
+      ab: { a: "adkflfalfd;f;" },
       emp: 0,
       fontSize: "14px",
       bdr: "1px solid #000",
@@ -173,11 +179,15 @@ export default {
       text_aligns,
       config: {},
       configjson: "{}",
-      lines: ["aaaa", "bbbb"],
+      lines: [
+        // "aaaa", "bbbb"
+      ],
       spaces: 0,
     };
   },
-  components: {},
+  components: {
+    Lines,
+  },
   computed: {},
   mounted() {
     // fetch("https://jsonplaceholder.typicode.com/todos?_limit=10")
@@ -206,11 +216,15 @@ export default {
       function moveAt(e) {
         ss.style.left =
           e.pageX -
-          document.getElementById("print_area").getBoundingClientRect().left +
+          2 -
+          document.getElementById("print_area").getBoundingClientRect().left -
+          window.scrollX +
           "px";
         ss.style.top =
           e.pageY -
-          document.getElementById("print_area").getBoundingClientRect().top +
+          2 -
+          document.getElementById("print_area").getBoundingClientRect().top -
+          window.scrollY +
           "px";
       }
       document.getElementById("print_area").onmousemove = function (e) {
@@ -234,10 +248,9 @@ export default {
       //     i.style.backgroundColor != 'transparent' ? i.style.backgroundColor = 'transparent' : i.style.backgroundColor = 'red';
       // }
     },
-    divideText(item, id) {
+    divideText(item, id, lines) {
       let iter = 0,
-        words = [],
-        lines = this.lines;
+        words = [];
       item = `${item}`;
       for (const i of item) {
         words[iter] == undefined ? (words[iter] = "" + i) : (words[iter] += i);
@@ -260,9 +273,13 @@ export default {
 
       iter = 0;
       for (const i of words) {
+        if (!lines[id]) {
+          lines[id] = [];
+          console.log(lines);
+        }
         if (!lines[id][iter]) {
-          console.log(lines, iter);
           lines[id][iter] = "";
+          console.log(lines, iter);
         }
         if (
           getTextWidth(lines[id][iter] + i, "normal 14px serif") <
@@ -277,8 +294,8 @@ export default {
           document.getElementsByClassName(this.active)[0].offsetWidth
         );
       }
-
-      console.log(lines);
+      this.lines = [...lines];
+      console.log(lines, words);
     },
     move: function (id, k) {
       for (let i of document.getElementsByClassName(this.active + "child1")) {
