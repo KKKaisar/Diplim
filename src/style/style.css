@@ -1,0 +1,90 @@
+* {
+  margin: 0;
+  padding: 0;
+  user-select: none;
+  box-sizing: border-box;
+}
+body,
+html {
+  height: 100%;
+}
+
+button {
+  border-radius: 0;
+  border: none;
+  border-left: 1px solid #000;
+  border-right: 1px solid #000;
+}
+
+#wrapper {
+  display: flex;
+  justify-content: center;
+  background-color: #aaa;
+  min-height: 100%;
+}
+
+.manager {
+  margin: 7px auto 0 auto;
+  display: flex;
+  flex-direction: column;
+}
+.manager a {
+  color: #000;
+}
+
+.dragElement {
+  /* text-align: center; */
+  /* margin: 10px; */
+  user-select: none;
+  border-style: none;
+  background-color: transparent;
+  position: absolute;
+}
+/* .dragElement:active {
+    background: yellow;
+} */
+
+[tabindex] {
+  outline: 0;
+  outline: none !important;
+}
+
+.container {
+  user-select: none;
+  width: 1050px;
+  height: 741px;
+  background: #fff;
+  background-size: 100%;
+  position: relative;
+}
+
+#print_area {
+  margin: 0 auto 70px auto;
+}
+
+.menu {
+  display: flex;
+  justify-content: center;
+  width: 50%;
+}
+
+.mode {
+  font-size: 15;
+  margin: 0 0 4px 0;
+  padding: 0;
+  background-color: #eee;
+  width: 100%;
+  border: 1px solid #333;
+  display: flex;
+  justify-content: space-around;
+}
+
+.drag_zone {
+  background-color: red;
+  height: 15px;
+  margin-bottom: 10px;
+}
+
+.dragable {
+  position: absolute;
+}
