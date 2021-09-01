@@ -96,6 +96,8 @@
             @activeitem="activeItem"
             @activechild="activeChild"
             :spaces="spaces"
+            @movel="move"
+            @mover="move"
           >
             <!-- < div
                     : style = "{border:bdr}"
@@ -181,11 +183,11 @@ export default {
     //     });
 
     window.vm = this;
-    for (let j of document.getElementsByClassName("dragElement")) {
-      for (let i of document.getElementsByClassName(j.classList[2])) {
-        i.style.width = "400px";
-      }
-    }
+    // for (let j of document.getElementsByClassName("dragElement")) {
+    //   for (let i of document.getElementsByClassName(j.classList[2])) {
+    //     i.style.width = "400px";
+    //   }
+    // }
   },
   methods: {
     test: function name(ss) {
@@ -309,18 +311,7 @@ export default {
       );
     },
     move: function (id, k) {
-      for (let i of document.getElementsByClassName(this.active + "child1")) {
-        if (k == "d") {
-          console.log(i.textContent);
-          ++this.spaces;
-          this.divideText();
-        } else if (k == "u") {
-          console.log(i.textContent);
-          // i.innerHTML = '&npsp;' + i.innerHTML
-          if (this.spaces > 0) --this.spaces;
-        }
-      }
-      for (let i of document.getElementsByClassName(this.active + "child2")) {
+      for (let i of document.getElementsByClassName(this.active_child)) {
         if (k == "l") {
           console.log(i.style.left);
           i.style.left = `${Number(i.style.left.replace(/[^+\d]/g, "")) - 1}px`;
@@ -328,6 +319,13 @@ export default {
           console.log(i.style.left);
           i.style.left = `${Number(i.style.left.replace(/[^+\d]/g, "")) + 1}px`;
         }
+        // else if (k == "u") {
+        //   console.log(i.style.left);
+        //   i.style.left = `${Number(i.style.left.replace(/[^+\d]/g, "")) + 1}px`;
+        // } else if (k == "d") {
+        //   console.log(i.style.left);
+        //   i.style.left = `${Number(i.style.left.replace(/[^+\d]/g, "")) + 1}px`;
+        // }
       }
     },
     changeFontSize: function (c) {
