@@ -1,7 +1,6 @@
 <template>
   <div id="wrapper">
     <main class="main">
-      {{ ab.a }}
       <div class="manager">
         <div class="menu">
           <div class="mode">Font size</div>
@@ -87,36 +86,17 @@
       </div>
       <div id="print_area">
         <div class="container" v-for="(student, i) in students" :key="i">
-          <div
-            tabindex="0"
-            class="dragElement dragable"
+          <Lines
             v-for="(item, index) in student"
-            :style="{ border: bdr, top: index * 50 + 'px' }"
-            @click="activeItem('drag' + index)"
-            @keydown.down="move(index, 'd')"
-            @keydown.up="move(index, 'u')"
-            @keydown.left="move(index, 'l')"
-            @keydown.right="move(index, 'r')"
-            :class="'drag' + index"
             :key="index"
+            :item="item"
+            :index="index"
+            :bdr="bdr"
+            :lines="lines"
+            @activeitem="activeItem"
+            @activechild="activeChild"
+            :spaces="spaces"
           >
-            <div
-              onload="console.log(2)"
-              class="drag_zone"
-              onmouseup=""
-              onclick="vm.dragFunc(this.parentElement,event)"
-            ></div>
-            <Lines
-              v-for="(line, i) in lines[index]"
-              :key="i"
-              :class="'drag' + index + '' + i"
-              :item="item"
-              :index="index"
-              :line="line"
-              :i="i"
-            >
-              <!-- {{ "&nbsp;".repeat(spaces) }}{{ line }} -->
-            </Lines>
             <!-- < div
                     : style = "{border:bdr}"
                     style = "display: block; z-index: 30"
@@ -126,7 +106,7 @@
                     >
                     {{ text }}
                   </div > -->
-          </div>
+          </Lines>
         </div>
       </div>
     </main>
@@ -167,13 +147,13 @@ export default {
   // el: "#wrapper",
   data() {
     return {
-      ab: { a: "adkflfalfd;f;" },
       emp: 0,
       fontSize: "14px",
       bdr: "1px solid #000",
       sb: "red",
       align: "left",
       active: "drag0",
+      active_child: "drag00",
       // students: [],
       students,
       text_aligns,
@@ -201,7 +181,6 @@ export default {
     //     });
 
     window.vm = this;
-
     for (let j of document.getElementsByClassName("dragElement")) {
       for (let i of document.getElementsByClassName(j.classList[2])) {
         i.style.width = "400px";
@@ -237,8 +216,19 @@ export default {
       this.align = document.querySelector("." + this.active).style.textAlign;
       for (let i of document.getElementsByClassName("drag_zone")) {
         i.parentElement.classList.contains(this.active)
-          ? (i.style.backgroundColor = "yellow")
+          ? (i.style.backgroundColor = "orange")
           : (i.style.backgroundColor = "red");
+      }
+    },
+    activeChild: function (classs) {
+      this.active_child = classs;
+      // this.align = document.querySelector("." + this.active_child).style.textAlign;
+      for (let i of document.getElementsByClassName("dragable")) {
+        for (let j of i.children) {
+          j.classList.contains(classs)
+            ? (j.style.backgroundColor = "yellow")
+            : (j.style.backgroundColor = "white");
+        }
       }
     },
     showBorder: function () {
@@ -248,7 +238,7 @@ export default {
       //     i.style.backgroundColor != 'transparent' ? i.style.backgroundColor = 'transparent' : i.style.backgroundColor = 'red';
       // }
     },
-    divideText(item, id, lines) {
+    divideText(item, id, lines, active) {
       let iter = 0,
         words = [];
       item = `${item}`;
@@ -267,23 +257,37 @@ export default {
         var metrics = context.measureText(text);
         return metrics.width;
       }
+
+      function getTextSize() {
+        return document.getElementsByClassName(active)[0].style.fontSize
+          ? document.getElementsByClassName(active)[0].style.fontSize
+          : "14px";
+      }
+
       document.getElementsByClassName;
 
-      console.log(getTextWidth(item, "normal 14px serif"), words);
+      console.log(getTextWidth(item, `normal ${getTextSize()} serif`), words);
 
       iter = 0;
+
+      if (!lines[id]) {
+        lines[id] = [];
+        console.log(lines);
+      }
+
       for (const i of words) {
-        if (!lines[id]) {
-          lines[id] = [];
-          console.log(lines);
-        }
         if (!lines[id][iter]) {
           lines[id][iter] = "";
           console.log(lines, iter);
         }
+
         if (
-          getTextWidth(lines[id][iter] + i, "normal 14px serif") <
-          document.getElementsByClassName(this.active)[0].style.width
+          getTextWidth(item, `normal ${getTextSize()} serif`) <
+          Number(
+            document
+              .getElementsByClassName(active)[0]
+              .style.width.replace(/[^+\d]/g, "")
+          )
         ) {
           lines[id][iter] += i;
         } else {
@@ -291,11 +295,18 @@ export default {
         }
         console.log(
           getTextWidth(lines[id][iter] + i, "normal 14px serif"),
-          document.getElementsByClassName(this.active)[0].offsetWidth
+          document.getElementsByClassName(active)[0].style.width,
+          "IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII",
+          i
         );
       }
       this.lines = [...lines];
-      console.log(lines, words);
+      console.log(
+        "EENNDD",
+        lines,
+        words,
+        document.getElementsByClassName(active)[0]
+      );
     },
     move: function (id, k) {
       for (let i of document.getElementsByClassName(this.active + "child1")) {
@@ -343,8 +354,10 @@ export default {
       }
     },
     changeWidth: function (c) {
-      for (let i of document.getElementsByClassName(this.active)) {
-        if (!document.getElementsByClassName(this.active)[0].style.width) {
+      for (let i of document.getElementsByClassName(this.active_child)) {
+        if (
+          !document.getElementsByClassName(this.active_child)[0].style.width
+        ) {
           i.style.width = i.offsetWidth + "px";
         }
         i.style.width = `${Number(i.style.width.replace(/[^+\d]/g, "")) + c}px`;
