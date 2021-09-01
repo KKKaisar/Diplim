@@ -33,13 +33,15 @@
 export default {
   props: ["item", "index", "bdr", "lines", "spaces"],
   mounted() {
-    console.log("DVDTXT");
+    this.lines[this.index] = [];
+    this.lines[this.index][0] = this.item;
     // this.$parent.divideText(
     //   this.item,
     //   this.index,
     //   this.lines,
     //   "drag" + this.index
     // );
+    this.$parent.lines = [...this.lines];
   },
 };
 </script>

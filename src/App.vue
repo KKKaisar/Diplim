@@ -211,7 +211,6 @@ export default {
       document.getElementById("print_area").onmousemove = function (e) {
         moveAt(e);
       };
-      ss.i = 1;
     },
     activeItem: function (classs) {
       this.active = classs;
@@ -240,14 +239,33 @@ export default {
       //     i.style.backgroundColor != 'transparent' ? i.style.backgroundColor = 'transparent' : i.style.backgroundColor = 'red';
       // }
     },
-    divideText(item, id, lines, active) {
+    divideText() {
       let iter = 0,
+        line =
+          this.lines[this.active[this.active.length - 1]][
+            this.active_child[this.active_child.length - 1]
+          ],
+        line2 =
+          this.lines[this.active[this.active.length - 1]][
+            Number(this.active_child[this.active_child.length - 1]) + 1
+          ],
         words = [];
-      item = `${item}`;
-      for (const i of item) {
+
+      if (
+        !this.lines[this.active[this.active.length - 1]][
+          Number(this.active_child[this.active_child.length - 1]) + 1
+        ]
+      ) {
+        this.lines[this.active[this.active.length - 1]][
+          Number(this.active_child[this.active_child.length - 1]) + 1
+        ] = "";
+      }
+
+      for (const i of line) {
         words[iter] == undefined ? (words[iter] = "" + i) : (words[iter] += i);
         if (i == " ") iter++;
       }
+      console.log("LIINE", words, line, line2, "LIINE");
 
       function getTextWidth(text, font) {
         // re-use canvas object for better performance
@@ -260,63 +278,69 @@ export default {
         return metrics.width;
       }
 
-      function getTextSize() {
-        return document.getElementsByClassName(active)[0].style.fontSize
-          ? document.getElementsByClassName(active)[0].style.fontSize
+      let getTextSize = () => {
+        return document.getElementsByClassName(this.active)[0].style.fontSize
+          ? document.getElementsByClassName(this.active)[0].style.fontSize
           : "14px";
-      }
+      };
 
-      document.getElementsByClassName;
-
-      console.log(getTextWidth(item, `normal ${getTextSize()} serif`), words);
+      console.log(getTextWidth(line, `normal ${getTextSize()} serif`), words);
 
       iter = 0;
 
-      if (!lines[id]) {
-        lines[id] = [];
-        console.log(lines);
+      if (
+        getTextWidth(line, `normal ${getTextSize()} serif`) <
+        document
+          .getElementsByClassName(this.active_child)[0]
+          .style.width.replace(/[^+\d]/g, "")
+      ) {
+        this.lines[this.active[this.active.length - 1]][
+          this.active_child[this.active_child.length - 1]
+        ] = line;
       }
 
+      line = "";
+      line2 =
+        this.lines[this.active[this.active.length - 1]][
+          Number(this.active_child[this.active_child.length - 1]) + 1
+        ];
+
+      window.words = words;
       for (const i of words) {
-        if (!lines[id][iter]) {
-          lines[id][iter] = "";
-          console.log(lines, iter);
-        }
-
         if (
-          getTextWidth(item, `normal ${getTextSize()} serif`) <
-          Number(
-            document
-              .getElementsByClassName(active)[0]
-              .style.width.replace(/[^+\d]/g, "")
-          )
+          getTextWidth(line + i, `normal ${getTextSize()} serif`) <
+          document
+            .getElementsByClassName(this.active_child)[0]
+            .style.width.replace(/[^+\d]/g, "")
         ) {
-          lines[id][iter] += i;
+          line += i;
         } else {
-          ++iter;
+          line2 = i + line2;
         }
-        console.log(
-          getTextWidth(lines[id][iter] + i, "normal 14px serif"),
-          document.getElementsByClassName(active)[0].style.width,
-          "IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII",
-          i
-        );
       }
-      this.lines = [...lines];
-      console.log(
-        "EENNDD",
-        lines,
-        words,
-        document.getElementsByClassName(active)[0]
-      );
+      console.log("LINE!", line, "LINE@", line2);
+      this.lines[this.active[this.active.length - 1]][
+        this.active_child[this.active_child.length - 1]
+      ] = line;
+
+      this.lines[this.active[this.active.length - 1]][
+        Number(this.active_child[this.active_child.length - 1]) + 1
+      ] = line2;
+      window.line = line;
+      this.lines = [...this.lines];
     },
     move: function (id, k) {
       for (let i of document.getElementsByClassName(this.active_child)) {
         if (k == "l") {
           console.log(i.style.left);
-          i.style.left = `${Number(i.style.left.replace(/[^+\d]/g, "")) - 1}px`;
+          if (i.style.left.replace(/[^+\d]/g, "") > 0) {
+            i.style.left = `${
+              Number(i.style.left.replace(/[^+\d]/g, "")) - 1
+            }px`;
+          }
         } else if (k == "r") {
           console.log(i.style.left);
+          // if (!i.style.left) i.style.left = "0px";
           i.style.left = `${Number(i.style.left.replace(/[^+\d]/g, "")) + 1}px`;
         }
         // else if (k == "u") {
@@ -360,6 +384,8 @@ export default {
         }
         i.style.width = `${Number(i.style.width.replace(/[^+\d]/g, "")) + c}px`;
       }
+
+      this.divideText();
     },
     showTemplate: function (event) {
       for (const output of document.getElementsByClassName("container")) {

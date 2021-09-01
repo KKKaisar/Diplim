@@ -2,7 +2,9 @@
   margin: 0;
   padding: 0;
   user-select: none;
-  box-sizing: border-box;
+  font-family: "Times New Roman", Times, serif;
+
+  /* box-sizing: border-box; */
 }
 body,
 html {
@@ -36,6 +38,7 @@ button {
   /* text-align: center; */
   /* margin: 10px; */
   user-select: none;
+  font-size: 14px;
   border-style: none;
   background-color: transparent;
   position: absolute;
