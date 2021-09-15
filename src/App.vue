@@ -3,6 +3,15 @@
     <main class="main">
       <div class="manager">
         <div class="menu">
+          <div class="mode">Paper Format</div>
+          <div class="mode">
+            <select name="" id="" style="width: 100%">
+              <option value="a4">A4</option>
+              <option value="a5">A5</option>
+            </select>
+          </div>
+        </div>
+        <div class="menu">
           <div class="mode">Font size</div>
           <div class="mode">
             <button @click="changeFontSize(1)">+1</button
@@ -120,6 +129,7 @@ import Lines from "./components/Lines.vue";
 
 let students = [
   [
+    "Number",
     "Fullname Fullname Fullname Fullname Fullname Fullname Fullname Fullname Fullname Fullname",
     "Univercity Univercity Univercity Univercity Univercity Univercity Univercity Univercity",
     "Programmer developer tester phisyc scientist Programmer developer tester phisyc scientist",
@@ -183,11 +193,15 @@ export default {
     //     });
 
     window.vm = this;
-    // for (let j of document.getElementsByClassName("dragElement")) {
-    //   for (let i of document.getElementsByClassName(j.classList[2])) {
-    //     i.style.width = "400px";
-    //   }
-    // }
+    setTimeout(() => {
+      for (let i of document.getElementsByClassName("dragable")) {
+        for (let j of i.children) {
+          if (!j.classList.contains("drag_zone")) {
+            j.style.width = j.offsetWidth + "px";
+          }
+        }
+      }
+    }, 100);
   },
   methods: {
     test: function name(ss) {
@@ -227,8 +241,8 @@ export default {
       for (let i of document.getElementsByClassName("dragable")) {
         for (let j of i.children) {
           j.classList.contains(classs)
-            ? (j.style.backgroundColor = "yellow")
-            : (j.style.backgroundColor = "white");
+            ? (j.style.backgroundColor = "rgba(255,255,0,.7)")
+            : (j.style.backgroundColor = "");
         }
       }
     },
@@ -239,7 +253,7 @@ export default {
       //     i.style.backgroundColor != 'transparent' ? i.style.backgroundColor = 'transparent' : i.style.backgroundColor = 'red';
       // }
     },
-    divideText() {
+    divideText(ch) {
       let iter = 0,
         line =
           this.lines[this.active[this.active.length - 1]][
@@ -250,6 +264,8 @@ export default {
             Number(this.active_child[this.active_child.length - 1]) + 1
           ],
         words = [];
+
+      if (ch > 0) line2; //!= undefined ? (line = line + " " + line2) : line;
 
       if (
         !this.lines[this.active[this.active.length - 1]][
@@ -265,7 +281,12 @@ export default {
         words[iter] == undefined ? (words[iter] = "" + i) : (words[iter] += i);
         if (i == " ") iter++;
       }
-      console.log("LIINE", words, line, line2, "LIINE");
+      // for (const i of line2) {
+      //   words[iter] == undefined ? (words[iter] = "" + i) : (words[iter] += i);
+      //   if (i == " ") iter++;
+      // }
+
+      console.log(words);
 
       function getTextWidth(text, font) {
         // re-use canvas object for better performance
@@ -283,8 +304,6 @@ export default {
           ? document.getElementsByClassName(this.active)[0].style.fontSize
           : "14px";
       };
-
-      console.log(getTextWidth(line, `normal ${getTextSize()} serif`), words);
 
       iter = 0;
 
@@ -318,7 +337,6 @@ export default {
           line2 = i + line2;
         }
       }
-      console.log("LINE!", line, "LINE@", line2);
       this.lines[this.active[this.active.length - 1]][
         this.active_child[this.active_child.length - 1]
       ] = line;
@@ -332,14 +350,12 @@ export default {
     move: function (id, k) {
       for (let i of document.getElementsByClassName(this.active_child)) {
         if (k == "l") {
-          console.log(i.style.left);
           if (i.style.left.replace(/[^+\d]/g, "") > 0) {
             i.style.left = `${
               Number(i.style.left.replace(/[^+\d]/g, "")) - 1
             }px`;
           }
         } else if (k == "r") {
-          console.log(i.style.left);
           // if (!i.style.left) i.style.left = "0px";
           i.style.left = `${Number(i.style.left.replace(/[^+\d]/g, "")) + 1}px`;
         }
@@ -385,7 +401,17 @@ export default {
         i.style.width = `${Number(i.style.width.replace(/[^+\d]/g, "")) + c}px`;
       }
 
-      this.divideText();
+      this.divideText(c);
+
+      setTimeout(() => {
+        for (let i of document.getElementsByClassName("dragable")) {
+          for (let j of i.children) {
+            if (!j.classList.contains("drag_zone")) {
+              j.style.width = j.clientWidth + "px";
+            }
+          }
+        }
+      }, 100);
     },
     showTemplate: function (event) {
       for (const output of document.getElementsByClassName("container")) {
@@ -438,6 +464,7 @@ export default {
     print: function (inp) {
       let reader = new FileReader();
       let file = inp.files[0];
+      this.bdr = "";
 
       // this.showBorder
 

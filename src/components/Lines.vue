@@ -13,7 +13,7 @@
     ></div>
     <div
       :style="{ border: bdr }"
-      style="position: relative"
+      style="position: relative; background: transparent"
       v-for="(line, i) in lines[index]"
       :key="i"
       :class="'drag' + index + '' + i"
